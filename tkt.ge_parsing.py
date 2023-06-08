@@ -30,30 +30,85 @@ for result in result_place:
 
 
 url_teatri = 'https://tkt.ge/theatre'
-page = requests.get(url_teatri)
-soup = BeautifulSoup(page.text, 'html.parser')
-result_teatri_header = soup.find_all(class_='eventItem__EventItemDescTitle-sc-1xt5420-6 geviHq')
+page2 = requests.get(url_teatri)
+soup2 = BeautifulSoup(page2.text, 'html.parser')
+result_teatri_header = soup2.find_all(class_='eventItem__EventItemDescTitle-sc-1xt5420-6 geviHq')
 for result in result_teatri_header:
     teatri_header.append(result.text)
 
 
-result_teatri_place = soup.find_all(class_='eventItem__EventItemDescLocation-sc-1xt5420-7 elQKfu')
+result_teatri_place = soup2.find_all(class_='eventItem__EventItemDescLocation-sc-1xt5420-7 elQKfu')
 for result in result_teatri_place:
     teatri_place.append(result.text)
 
 url_opera = 'https://tkt.ge/opera'
-page = requests.get(url_opera)
-soup = BeautifulSoup(page.text, 'html.parser')
-result_opera = soup.find_all(class_='eventItem__EventItemDescTitle-sc-1xt5420-6 geviHq')
+page1 = requests.get(url_opera)
+soup1 = BeautifulSoup(page1.text, 'html.parser')
+result_opera = soup1.find_all(class_='eventItem__EventItemDescTitle-sc-1xt5420-6 geviHq')
 for result in result_opera:
     opera_header.append(result.text)
 
 
-result_opera_place = soup.find_all(class_='eventItem__EventItemDescLocation-sc-1xt5420-7 elQKfu')
+result_opera_place = soup1.find_all(class_='eventItem__EventItemDescLocation-sc-1xt5420-7 elQKfu')
 for result in result_opera_place:
     opera_place.append(result.text)
 
 
+# scrapping links for events
+link_results = soup.find_all(attrs={'data-testid': 'anchor-tag'})
+events_links = []
+for result in link_results:
+    links = result.get('href')
+    if links is None:
+        pass
+    else:
+        b3 = ("https://tkt.ge/" + links)
+        print(b3)
+        events_links.append(b3)
+print(len(events_links))
+print(len(koncertebi_header))
+
+# scrapping for teatri
+link_results_teatri = soup2.find_all(attrs={'data-testid': 'anchor-tag'})
+teatri_links = []
+for result in link_results_teatri:
+    links = result.get('href')
+    if links is None:
+        pass
+    else:
+        b2 = ("https://tkt.ge/" + links)
+        print(b2)
+        teatri_links.append(b2)
+print(len(teatri_links))
+print(len(teatri_header))
+
+# scrapping links for opera
+# scrapping for teatri
+link_results_opera = soup1.find_all(attrs={'data-testid': 'anchor-tag'})
+opera_links = []
+for result in link_results_opera:
+    links = result.get('href')
+    if links is None:
+        pass
+    else:
+        b1 = ("https://tkt.ge/" + links)
+        print(b1)
+        opera_links.append(b1)
+print(len(opera_links))
+print(len(opera_header))
+
+# function for getting links on select
+
+def on_select():
+    selected_links = listbox3.curselection()
+    if selected_links:
+        selected_record = events_links[selected_links[2]]
+        for record in events_links:
+            listbox4.insert(tk.END, record[2])
+
+
+
+# adding our recordes in one list
 for a, b in zip(koncertebi_header, koncertebi_place):
     koncertebi.append([a, b])
 
@@ -154,8 +209,6 @@ for item in opera:
 
 
 
-
-
 # tkinter window
 mainWindow = tk.Tk()
 mainWindow.title('TKT.GE')
@@ -169,7 +222,7 @@ koncert_label = tk.Label(mainWindow, text="კონცერტები", fore
 koncert_label.grid(column=1, row=1)
 scrollbar = tk.Scrollbar(names_frame)
 scrollbar.pack(side='right', fill='y')
-listbox = tk.Listbox(names_frame, yscrollcommand=scrollbar.set, width=80, height=40)
+listbox = tk.Listbox(names_frame, yscrollcommand=scrollbar.set, width=80, height=30)
 listbox.pack(side='left', fill='both', expand=True)
 scrollbar.config(command=listbox.yview)
 
@@ -180,7 +233,7 @@ teatri_label = tk.Label(mainWindow, text="თეატრი", foreground='red')
 teatri_label.grid(column=2, row=1)
 scrollbar1 = tk.Scrollbar(teatri_frame)
 scrollbar1.pack(side='right', fill='y')
-listbox1 = tk.Listbox(teatri_frame, yscrollcommand=scrollbar1.set, width=80, height=40)
+listbox1 = tk.Listbox(teatri_frame, yscrollcommand=scrollbar1.set, width=80, height=30)
 listbox1.pack(side='left', fill='both', expand=True)
 scrollbar1.config(command=listbox1.yview)
 
@@ -191,9 +244,25 @@ opera_label = tk.Label(mainWindow, text="ოპერა", foreground='red')
 opera_label.grid(column=3, row=1)
 scrollbar2 = tk.Scrollbar(opera_frame)
 scrollbar2.pack(side='right', fill='y')
-listbox2 = tk.Listbox(opera_frame, yscrollcommand=scrollbar2.set, width=80, height=40, fg='blue')
+listbox2 = tk.Listbox(opera_frame, yscrollcommand=scrollbar2.set, width=80, height=30)
 listbox2.pack(side='left', fill='both', expand=True)
 scrollbar2.config(command=listbox2.yview)
+
+# for search bar frame
+search_frame = tk.Frame(mainWindow)
+search_frame.place(x=200, y=550)
+scrollbar3 = tk.Scrollbar(search_frame)
+scrollbar3.pack(side='right', fill='y')
+listbox3 = tk.Listbox(search_frame, yscrollcommand=scrollbar3.set, width=150)
+listbox3.pack(side='left', fill='both', expand=True)
+scrollbar3.config(command=listbox3.yview)
+
+
+# links frame
+link_frame = tk.Frame(mainWindow)
+link_frame.place(x=1150, y=550)
+listbox4 = tk.Listbox(link_frame, width=40)
+listbox4.pack(side='left', fill='both', expand=True)
 
 
 
@@ -202,12 +271,59 @@ koncertebi_sql = koncertebi_from_sql()
 opera_sql = opera_from_sql()
 teatri_sql = teatri_from_sql()
 
-for i in koncertebi_sql:
-    listbox.insert('end', i)
-for i in teatri_sql:
-    listbox1.insert('end', i)
-for i in opera_sql:
-    listbox2.insert('end', i)
+def show_events():
+    listbox.delete(0, tk.END)
+    for i in koncertebi_sql:
+        listbox.insert('end', i)
+
+def show_teatri():
+    listbox1.delete(0, tk.END)
+    for i in teatri_sql:
+        listbox1.insert('end', i)
+
+def show_opera():
+    listbox2.delete(0, tk.END)
+    for i in opera_sql:
+        listbox2.insert('end', i)
+
+
+
+event_button = tk.Button(mainWindow, text='events', command=show_events, width=20, background="yellow")
+event_button.place(x=150, y=510)
+teatri_button = tk.Button(mainWindow, text='teatri', command=show_teatri, width=20, background="yellow")
+teatri_button.place(x=650, y=510)
+opera_button = tk.Button(mainWindow, text='opera', command=show_opera, width=20, background="yellow")
+opera_button.place(x=1150, y=510)
+
+
+
+
+def search_word():
+    find = entry.get()
+    connection = sqlite3.connect('koncertebi.db')
+    table_names = ["teatri", "events", "opera"]
+    cursor = connection.cursor()
+    matching_records = []
+    for table in table_names:
+        cursor.execute(f"SELECT * FROM {table}")
+        records = cursor.fetchall()
+        for record in records:
+            if find.lower() in str(record).lower():
+                matching_records.append(record)
+        listbox3.delete(0, tk.END)
+        for result in matching_records:
+            listbox3.insert(tk.END, result)
+
+
+
+
+entry = tk.Entry(mainWindow, width=20)
+entry.place(x=600, y=720)
+
+button_search = tk.Button(mainWindow, text='Search', command=search_word,  background="green")
+button_search.place(x=725, y=720)
+
+
 
 
 conn.close()
